@@ -845,8 +845,9 @@ impl PinnedDrop for ReplicationStream<'_> {
     fn drop(mut self: Pin<&mut Self>) {
         let this = self.project();
         if *this.copyboth_received && !*this.copydone_sent {
-            this.rclient.send_copydone().unwrap();
-            *this.copydone_sent = true;
+            if this.rclient.send_copydone().is_ok() {
+                *this.copydone_sent = true;
+            }
         }
     }
 }
